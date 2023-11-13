@@ -19,26 +19,42 @@ export class PaymentService {
     }
 
     async create(data: Payment): Promise<Payment> {
-        if(data.date < new Date()) throw new PaymentException("Pagamento não realizado. Não é possivel realizar um pagamento com data retroativa");
-        if(data.date == new Date()) data.status == "PAID";
-        if(data.date > new Date()) data.status == "PENDING";
+        if(data.date < new Date()) {
+            throw new PaymentException("Pagamento não realizado. Não é possivel realizar um pagamento com data retroativa");
+        }
+        if(data.date == new Date()) {
+            data.status = "PAID";
+        }
+        if(data.date > new Date()) {
+            data.status = "PENDING";
+        }
         return await this.paymentRepository.create(data);
     }
 
     async update(data: Payment): Promise<Payment> {
         const payment = await this.paymentRepository.getById(data.id);;
-        if(payment == null) throw new PaymentException("Pagamento não encontrado");
-        if(payment.date >= new Date()) throw new PaymentException("Pagamento não pode ser atualizado pois já foi realizado");
-        if(payment.status == "PAID") throw new PaymentException("Pagamento não pode ser atualizado pois já foi realizado");
-        if(data.date == new Date()) data.status == "PAID";
-        if(data.date > new Date()) data.status == "PENDING";
+        if(payment == null) {
+            throw new PaymentException("Pagamento não encontrado");
+        }
+        if(payment.date <= new Date()){
+            throw new PaymentException("Pagamento não pode ser atualizado pois já foi realizado");
+        }
+        if(payment.status == "PAID") {
+            throw new PaymentException("Pagamento não pode ser atualizado pois já foi realizado");
+        }
+        if(data.date >= new Date()) {
+            data.status = "PAID";
+        }
+        if(data.date > new Date()) {
+            data.status = "PENDING";
+        }
         return await this.paymentRepository.update(data);
     }
 
     async delete(id: number): Promise<Payment> {
         const payment = await this.paymentRepository.getById(id);;
         if(payment == null) throw new PaymentException("Pagamento não encontrado");
-        if(payment.date >= new Date()) throw new PaymentException("Pagamento não pode ser deletado pois já foi realizado");
+        if(payment.date <= new Date()) throw new PaymentException("Pagamento não pode ser deletado pois já foi realizado");
         if(payment.status == "PAID") throw new PaymentException("Pagamento não pode ser deletado pois já foi realizado");
         return await this.paymentRepository.delete(id);
     }
@@ -50,7 +66,7 @@ export class PaymentService {
     private async updateStatus(): Promise<void> {
         const payments = await this.paymentRepository.getByStatus("PENDING");
         payments.forEach(payment => {
-            if(payment.date >= new Date()) {
+            if(payment.date <= new Date()) {
                 payment.status = "PAID";
                 this.paymentRepository.update(payment);
             }
