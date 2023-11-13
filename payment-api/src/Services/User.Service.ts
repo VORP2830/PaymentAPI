@@ -1,7 +1,9 @@
+import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { PaymentException } from "src/Exceptions/Excption";
 import { UserRepository } from "src/Repositories/User.Repository";
 
+@Injectable()
 export class UserService {
     constructor(private readonly userRepository: UserRepository) { }
 

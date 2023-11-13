@@ -1,10 +1,13 @@
+import { Injectable } from "@nestjs/common";
 import { Payment, Status } from "@prisma/client";
 import { PaymentException } from "src/Exceptions/Excption";
 import { PaymentRepository } from "src/Repositories/Payment.Repository";
 
+
+@Injectable()
 export class PaymentService {
     constructor(private readonly paymentRepository: PaymentRepository) { 
-        setInterval(this.updateStatus, 30000);
+        setInterval(() => this.updateStatus(), 30000);
     }
 
     async getById(id: number): Promise<Payment> {

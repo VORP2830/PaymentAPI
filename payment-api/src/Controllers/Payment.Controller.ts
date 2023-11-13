@@ -6,7 +6,7 @@ import { PaymentService } from "src/Services/Payment.Service";
 export class PaymentController{
     constructor(private readonly paymentService: PaymentService) { }
 
-    @Get()
+    @Get("status/:status")
     async getByStatus(@Param('status') status: Status): Promise<Payment[]>{
         return await this.paymentService.getByStatus(status);
     }
