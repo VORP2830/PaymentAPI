@@ -1,0 +1,36 @@
+// Este es tu archivo de esquema de Prisma,
+// obtén más información al respecto en la documentación: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int      @id(map: "PK_User") @default(autoincrement())
+  name               String
+  userName           String   @unique
+  password           String
+  paymentsMade       Payment[] @relation("userPayer")
+  paymentsReceived   Payment[] @relation("userPayee")
+}
+
+model Payment {
+  id            Int      @id(map: "PK_Payment") @default(autoincrement())
+  value         Float
+  userPayerId   Int?
+  userPayeeId   Int
+  date          DateTime
+  status        Status
+  userPayer     User?    @relation("userPayer", fields: [userPayerId], references: [id])
+  userPayee     User     @relation("userPayee", fields: [userPayeeId], references: [id])
+}
+
+enum Status {
+  PENDING
+  PAID
+}
